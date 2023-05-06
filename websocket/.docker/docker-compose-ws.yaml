@@ -1,0 +1,35 @@
+version: "3.8"
+
+services:
+  socket-server:
+    container_name: ${HOST_NAME}_socket
+    image: ${REPO}/local-deploy/php${PHP_VERSION:-8.2-apache}:${PHP_IMAGE_VERSION:-latest}
+    entrypoint: "php /var/www/html/ws-server.php"
+    environment:
+      - "DOCUMENT_ROOT=${DOCUMENT_ROOT:-/var/www/html}"
+      - "HOST_NAME=${HOST_NAME:-localhost}"
+      - "LOCALTIME=${LOCALTIME:-Europe/Moscow}"
+      - "PHP_MEMORY_LIMIT=${PHP_MEMORY_LIMIT:-256M}"
+      - "PHP_POST_MAX_SIZE=${PHP_POST_MAX_SIZE:-100M}"
+      - "PHP_UPLOAD_MAX_FILESIZE=${PHP_UPLOAD_MAX_FILESIZE:-100M}"
+      - "PHP_MAX_FILE_UPLOADS=${PHP_MAX_FILE_UPLOADS:-50}"
+      - "PHP_MAX_EXECUTION_TIME=${PHP_MAX_EXECUTION_TIME:-60}"
+      - "VIRTUAL_HOST=${HOST_NAME:-localhost}"
+      - "ENVIRONMENT=dl"
+    volumes:
+      - "${PWD}/:/var/www/html/"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=dl_default"
+      - "traefik.http.routers.${NETWORK_NAME}_ws.entrypoints=ws"
+      - "traefik.http.routers.${NETWORK_NAME}_ws.rule=Host(`${HOST_NAME}.localhost`)"
+      - "traefik.http.services.${NETWORK_NAME}_ws.loadbalancer.server.port=8081"
+    networks:
+      dl_default: { }
+      default:
+        aliases:
+          - ${NETWORK_NAME}
+
+networks:
+  dl_default:
+    external: true

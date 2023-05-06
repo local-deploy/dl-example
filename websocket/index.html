@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>WebSocket</title>
+    <script>
+        let echoService;
+        append = function(text) {
+            document.getElementById("websocket_events").insertAdjacentHTML('beforeend',
+                "<li>" + text + "</li>",
+            );
+        };
+        window.onload = function() {
+            let host = window.location.host;
+            echoService = new WebSocket('ws://' + host + ':8081');
+            echoService.onmessage = function(event) {
+                append(event.data);
+            };
+            echoService.onopen = function() {
+                append("Connected to WebSocket!");
+            };
+            echoService.onclose = function() {
+                append("Connection closed");
+            };
+            echoService.onerror = function() {
+                append("Error happens");
+            };
+        };
+
+        function sendMessage() {
+            let message = document.getElementById("message").value;
+            echoService.send(message);
+        }
+
+    </script>
+</head>
+
+<body>
+<div>
+    Message: <input value="Hello!" type="text" id="message"/><br><br>
+    <input type="button" value="Submit" onclick="sendMessage();"/><br>
+    <ul id="websocket_events">
+    </ul>
+</div>
+</body>
+
+</html>

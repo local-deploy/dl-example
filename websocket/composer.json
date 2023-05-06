@@ -1,0 +1,8 @@
+{
+    "name": "dl/ws",
+    "license": "MIT",
+    "description": "Example WebSocket",
+    "require": {
+        "vendor/textalk/websocket": "^1.6"
+    }
+}
